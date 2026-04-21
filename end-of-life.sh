@@ -7,6 +7,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+readonly VERSION="1.0.0"
 readonly BASE_URL="https://endoflife.date/api/v1"
 CURRENT_DATE=$(date +%Y-%m-%d)
 readonly CURRENT_DATE
@@ -19,10 +20,11 @@ finish() {
 trap finish EXIT ERR
 
 usage() {
-    cat <<'EOF' >&2
-Usage: ${0} <command> [args]
+    cat <<EOF >&2
+Usage: $(basename "$0") <command> [args]
 
 Commands:
+  -v, --version                  Show the version of the script.
   index                          List the main endoflife.date API endpoints.
   products                       List all products summary.
   products-full                  List all products with full details.
@@ -67,7 +69,7 @@ product_has_expired() {
         fi
 
         if [[ "${eol_from}" < "${CURRENT_DATE}" ]]; then
-            printf "%s\n" "${eol_from}"
+            printf "[EXPIRED] %s %s (EOL: %s)\n" "${product}" "${release}" "${eol_from}"
             return 1
         else
             printf "%s %s has not expired (EOL: %s).\n" "${product}" "${release}" "${eol_from}"
@@ -77,10 +79,10 @@ product_has_expired() {
         # List all expired versions
         local response
         response=$(api_get "/products/${product}")
-        echo "${response}" | jq -r --arg current "${CURRENT_DATE}" '
+        echo "${response}" | jq -r --arg current "${CURRENT_DATE}" --arg product "${product}" '
             .result.releases[] | 
             select(.eolFrom != null and .eolFrom != false and .eolFrom < $current) | 
-            "\(.name): \(.eolFrom)"
+            "[EXPIRED] \($product) \(.name) (EOL: \(.eolFrom))"
         '
     fi
 }
@@ -93,6 +95,9 @@ command="${1}"
 shift
 
 case "${command}" in
+    -v|--version|version)
+        printf "end-of-life-cli version %s\n" "${VERSION}"
+        ;;
     index)
         api_get "/"
         ;;
@@ -142,6 +147,13 @@ case "${command}" in
         fi
         ;;
     *)
+        printf "Error: Unknown command: %s\n" "${command}" >&2
+        if [[ "$#" -ge 1 ]]; then
+            printf "Maybe you meant: product-release %s %s?\n" "${command}" "${1}" >&2
+        else
+            printf "Maybe you meant: product %s?\n" "${command}" >&2
+        fi
+        printf "\n" >&2
         usage
         ;;
 esac
