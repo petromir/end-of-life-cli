@@ -19,6 +19,25 @@ Ensure the following tools are installed and available in your `PATH`:
 - `jq`: For parsing and filtering JSON responses.
 - `shellcheck`: For static analysis and linting.
 
+### Docker
+
+After each change in the bash script or Dockerfile use the following two commands to validate the script is working 
+properly:
+```bash
+docker build \
+  --build-arg VERSION=$(grep '^readonly VERSION=' end-of-life.sh | cut -d'"' -f2) \
+  -t end-of-life-cli .
+docker run --rm end-of-life-cli product-has-expired spring-boot 3.4
+```
+
+### CI/CD
+
+This repository uses GitHub Actions for continuous integration.
+- **Workflow**: `.github/workflows/bash-checks.yml`
+- **Steps**:
+  - Syntax validation with `bash -n`.
+  - Static analysis with `shellcheck`.
+
 ### Development
 
 - Always stick to the [endoflife OpenAPI](https://endoflife.date/docs/api/v1/openapi.yml) definition, 
