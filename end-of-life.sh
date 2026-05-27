@@ -8,6 +8,7 @@ set -o nounset
 set -o pipefail
 
 readonly VERSION="1.0.0"
+readonly ENDOFLIFE_API_VERSION="1.2.1"
 readonly BASE_URL="https://endoflife.date/api/v1"
 CURRENT_DATE=$(date +%Y-%m-%d)
 readonly CURRENT_DATE
