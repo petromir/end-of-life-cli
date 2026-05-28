@@ -82,6 +82,12 @@ standards are followed and the script is validated
 
 On each PR, `shellcheck` is invoked to validate the script.
 
+## Contributing
+
+Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) for details on how to get started.
+
+For security vulnerabilities, please refer to the [Security Policy](SECURITY.md).
+
 ## Support my work
 
 <a href="https://ko-fi.com/petromirdzhunev" target="_blank"><img src="https://raw.githubusercontent.com/petromir/petromir/refs/heads/master/assets/kofi-button.svg" alt="Buy Me A Ko-fi" style="height: 45px !important;width: 163px !important;" ></a>
